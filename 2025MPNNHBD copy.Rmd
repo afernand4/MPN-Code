@@ -1,0 +1,3007 @@
+---
+title: "MPN NHBD Survey Code"
+output: pdf_document
+date: "2025-07-29"
+---
+
+```{R}
+#loading libraries
+
+library(readr)
+
+library(tidyverse)
+
+library(stringr)
+```
+
+##ENGLISH CLEANING & WRANGLING##
+
+```{r}
+library(readr)
+EN_non_valid <- read_csv("C:/Users/alexandra.fernand/Desktop/2025 MPN Neighborhood Survey ENG.csv")
+View(EN_non_valid)
+
+
+
+```
+
+```{r}
+#making dataset more clear in terms of variable names and removing
+#unnecessary cols
+
+names(EN_non_valid)<-str_replace_all(names(EN_non_valid), c(" " = "." , "," = "","/" = ""
+                                                            )) #changing the spaces btw words to periods in order to change the names, changing the commas and dashes as well to avoid confusion
+
+EN_non_valid <- EN_non_valid%>% #chaning the names w/ the pipe function
+  rename(ID = Respondent.ID,
+         q1 = `How.old.are.you?`,
+         Start = `Start.Date`,
+         End = `End.Date`,
+        q2= `Are.you.a.parent.or.guardian.to.any.children.(under.the.age.of.24).that.live.at.home.with.you?`,
+        q3 = `What.zip.code.do.you.live.in?`,
+        q4 = `What.is.your.highest.level.of.education?`,
+        q5_r1 = `What.language.do.you.usually.speak.at.home?.(Check.all.that.apply).`,
+        q5_r2 = `...15`,
+        q5_r3 = `...16`,
+        q5_r4 = `...17`,
+        q5_r5 = `...18`,
+        q5_r6 = `...19`,
+        q5_r7 = `...20`,
+        q6 =`Which.of.the.following.best.describes.your.current.living.situation?`,
+        q6_other =`...22`,
+        q7 =`How.much.do.you.pay.in.monthly.rentmortgage.for.the.place.where.you.live.(your.portion.of.cost.not.total.amount.if.you.share.your.home.with.others)?`,
+        q8 = `How.long.have.you.been.in.your.current.living.situation?`,
+        q9 =`How.many.times.did.you.move.in.the.last.year?`,
+        q10_r1=`Do.you.have.access.to.the.internet.using.the.following.devices?.(Check.all.that.apply).`,
+        q10_r2 =`...27`,
+        q10_r3=`...28`,
+        q10_r4 =`...29`,
+        q11_r1 =`Where.do.you.usually.do.each.of.the.following.activities?`,
+        q11_r2 = `...31`,
+        q11_r3 = `...32`,
+        q11_r4 = `...33`,
+        q11_r5 = `...34`,
+       q12_r1 =`Where.do.you.usually.use.or.receive.each.of.the.following.services?`,
+       q12_r2 = `...36`,
+       q12_r3 = `...37`,
+       q12_r4 = `...38`,
+       q12_r5 = `...39`,
+       q12_r6 = `...40`,
+       q13_r1 = `How.much.do.you.agree.or.disagree.with.the.following.statements?`,
+       q13_r2 = `...42`,
+       q13_r3 = `...43`,
+       q13_r4 = `...44`,
+       q13_r5 = `...45`,
+       q13_r6 = `...46`,
+       q14 =`How.would.you.rate.the.following.services.in.the.Mission?`,
+       q14_r2 = `...48`,
+       q14_r3 = `...49`,
+       q14_r4 = `...50`,
+       q14_r5 = `...51`,
+       q15=`How.safe.would.you.say.you.feel.walking.in.the.Mission.during.the.day.time?`,
+       q16 = `How.safe.would.you.say.you.feel.walking.in.the.Mission.at.night?`,
+       q17 = `Compared.to.three.years.ago.how.would.you.say.the.Mission.has.changed.overall?`,
+       q18 = `Right.now.how.likely.are.you.to.recommend.the.Mission.to.someone.else.as.a.good.place.to.live?`,
+       q19 = `Overall.how.satisfied.would.you.say.you.are.living.in.the.Mission?`,
+       q20_r1 = `During.the.past.year.did.you.participate.in.any.of.the.following.community.activities.in.the.Mission?`,
+       q20_r2 = `...58`,
+       q20_r3 = `...59`,
+       q20_r4 = `...60`, #extra response in spanish so theres a '...61'
+       
+       q21_r1 = `How.likely.would.you.say.it.is.that.people.in.the.Mission.would.help.out.if.the.following.occurred?`,
+       q21_r2 = `...62`,
+       q21_r3 = `...63`,
+       q21_r4 = `...64`,
+       q22_r1 = `Which.of.the.following.describes.your.employment.situation?.(Check.all.that.apply).`,
+       q22_r2 = `...66`,
+       q22_r3 = `...67`,
+       q22_r4 = `...68`,
+       q22_r5 = `...69`,
+       q22_r6 = `...70`,
+       q22_r7 = `...71`,
+       q22_r8 = `...72`,
+       q23_r1 = `Please.select.the.industry.category.that.most.closely.aligns.with.your.primary.work.responsibilities..(Check.all.that.apply).`,
+       q23_r2 = `...74`,
+       q23_r3 = `...75`,
+       q23_r4 = `...76`,
+       q23_r5 = `...77`,
+       q23_r6 = `...78`,
+       q23_r7 = `...79`,
+       q23_r8 = `...80`,
+       q23_r9 = `...81`,
+       q23_r10= `...82`,
+       q23_r11= `...83`,
+       q23_r12= `...84`,
+       q24 = `Does.your.job.offer.paid.time.offsick.leave?`,
+       q25 = `How.many.hours.per.week.do.you.usually.work?`,
+       q26 = `What.was.your.household.or.total.family.income.in.2024?`,
+       q27 = `What.is.your.credit.score?`,
+       q28_r1 = `Are.you.currently.enrolled.in.any.of.the.following.public.benefits.(Check.all.that.apply).`,
+       q28_r2 = `...90`,
+       q28_r3 = `...91`,
+       q28_r4 = `...92`,
+       q28_r5 = `...93`,
+       q28_r6 = `...94`,
+       q28_r7 = `...95`,
+       q28_r8 = `...96`,
+       q28_r9 = `...97`,
+       q28_r10= `...98`,
+       q28_r11= `...99`,
+       q28_r12= `...100`,
+       q28_r13= `...101`,
+       q29_r1 = `Which.of.the.following.do.you.currently.have?`,
+       q29_r2 = `...103`,
+       q29_r3 = `...104`,
+       q30_r1 = `How.much.do.you.agree.with.each.of.the.following.statements?`,
+       q30_r2 = `...106`,
+       q30_r3 = `...107`,
+       q30_r4 = `...108`,
+       q31 = `How.much.money.do.you.have.saved.up?`,
+       q32 = `On.average.how.much.money.are.you.putting.into.your.savings.every.month?`,
+       q33 = `On.average.how.easy.is.it.for.you.to.make.the.rent.or.mortgage.payment.for.your.home.each.month?`,
+       q34 = `How.often.do.you.or.anyone.in.your.household.receive.free.groceries.or.meals.from.a.food.pantry.food.bank.church.or.other.place.that.helps.with.free.food?`,
+       q35r_1= `In.the.last.12.months.did.you.and.your.family.have.to.go.without.any.of.the.following.items.because.of.financial.difficulties?.(Check.all.that.apply)`,
+       q35_r2 = `...114`,
+       q35_r3 = `...115`,
+       q35_r4 = `...116`,
+       q35_r5 = `...117`,
+       q35_r6 = `...118`,
+       q35_r7 = `...119`,
+       q35_r8 = `...120`,
+       q35_r9 = `...121`,
+       q35_r10= `...122`,
+       q36 =`What.is.your.gender?`,
+       q36_other = `...124`,
+       q37_r1 = `What.is.your.raceethnicity?.Check.all.that.apply`,
+       q37_r2 = `...126`,
+       q37_r3 = `...127`,
+       q37_r4 = `...128`,
+       q37_r5 = `...129`,
+       q37_r6 = `...130`,
+       q37_r7 = `...131`,
+       q38 = `How.old.is.your.oldest.child.who.lives.with.you.at.least.part.of.the.time?`,
+       q39_r1 = `What.schooldaycare.does.your.child.currently.attend?`,
+       q39_other  = `...134`,
+       q40_r1 = `Does.your.child.have.any.of.the.following.specific.health.care.needs.and.disabilities.according.to.their.doctor.or.school.staff?.Check.all.that.apply.`,
+       q40_r2 = `...136`,
+       q40_r3 = `...137`,
+       q40_r4 = `...138`,
+       q40_r5 = `...139`,
+       q40_r6 = `...140`,
+       q40_r7 = `...141`,
+       q40_r8 = `...142`,
+       q40_r9 = `...143`,
+       q41 = `If.your.child.has.special.needs.do.you.andor.your.child.know.where.to.go.for.help.in.terms.of.school.programs.community.resources.etc.?...144`,
+       q42 = `How.satisfied.are.you.with.the.school.your.child.attends?...145`,
+       q43 = `Does.your.child.have.health.care.coverage.or.health.insurance?.(Private.insurance.HealthySF.Medi-Cal.etc.)...146`,
+       q44 =`Does.your.child.have.a.regular.doctor.or.nurse?.(Someone.they.see.regularly.for.check.ups.or.health.issues.who.knows.them.and.their.health.history.)...147`,
+       q45 = `How.often.do.you.take.your.child.for.a.routine.check-up?...148`,
+       q46 = `When.your.child.is.sick.or.you.need.medical.advice.for.them.where.do.you.usually.go?...149`,
+       q46_other =`...150`,
+       q47 =`How.many.days.a.week.do.you.or.your.family.read.books.with.your.child?`,
+       q48 = `On.average.how.much.time.per.day.do.your.children.typically.spend.looking.at.screens.(TV.phone.computer).at.home?.(Screen.time.at.school.does.not.count.)`,
+       q49 = `What.school.does.your.child.currently.attend?...153`,
+       q49_other = `...154`,
+       q50 =`Does.your.child.have.any.of.the.following.specific.health.care.needs.and.disabilities.according.to.their.doctor.or.school.staff?.(Check.all.that.apply)...155`,
+       q50_r2 = `...156`,
+       q50_r3 = `...157`,
+       q50_r4 = `...158`,
+       q50_r5 = `...159`,
+       q50_r6 = `...160`,
+       q50_r7 = `...161`,
+       q50_r8 = `...162`,
+       q51 = `If.your.child.has.special.needs.do.you.andor.your.child.know.where.to.go.for.help.in.terms.of.school.programs.community.resources.etc.?...163`,
+       q52 = `How.satisfied.are.you.with.the.school.your.child.attends?...164`,
+       q53 = `Does.your.child.have.health.care.coverage.or.health.insurance?.(Private.insurance.HealthySF.Medi-Cal.etc.)...165`,
+       q54 =`Does.your.child.have.a.regular.doctor.or.nurse?.(Someone.they.see.regularly.for.check.ups.or.health.issues.who.knows.them.and.their.health.history.)...166`,
+       q55 = `How.often.do.you.take.your.child.for.a.routine.check-up?...167`,
+       q56 = `When.your.child.is.sick.or.you.need.medical.advice.for.them.where.do.you.usually.go?...168`,
+       q56_other =`...169`,
+       q57 = `Does.your.child.participate.in.any.afterschool.programs.either.at.school.or.somewhere.else.in.the.community?...170`,
+       q58=`When.school.is.out.for.the.summer.how.often.does.your.child.attend.summer.camp.or.other.enrichment.programs?...171`,
+       q59 = `How.many.days.a.week.does.your.child.read.books.magazines.or.newspapers?.(With.or.without.your.help.)`,
+       q60 = `On.average.how.many.minutes.or.hours.a.day.does.your.child.spend.looking.at.screens.(TV.phone.computer).at.home?.Screen.time.at.school.does.not.count.`,
+       q61 = `What.school.does.your.child.currently.attend?...174`,
+       q61_other = `...175`,
+       q62_r1  =`Does.your.child.have.any.of.the.following.specific.health.care.needs.and.disabilities.according.to.their.doctor.or.school.staff?.(Check.all.that.apply)...176`,
+       q62_r2 = `...177`,
+       q62_r3 = `...178`,
+       q62_r4 = `...179`,
+       q62_r5 = `...180`,
+       q62_r6 = `...181`,
+       q62_r7 = `...182`,
+       q62_r8 = `...183`,
+       q63 = `If.your.child.has.special.needs.do.you.andor.your.child.know.where.to.go.for.help.in.terms.of.school.programs.community.resources.etc.?...184`,
+       q64 = `How.satisfied.are.you.with.the.school.your.child.attends?...185`,
+       q65 = `Does.your.child.have.health.care.coverage.or.health.insurance?.(Private.insurance.HealthySF.Medi-Cal.etc.)...186`,
+       q66 =`Does.your.child.have.a.regular.doctor.or.nurse?.(Someone.they.see.regularly.for.check.ups.or.health.issues.who.knows.them.and.their.health.history.)...187`,
+       q67 = `How.often.do.you.take.your.child.for.a.routine.check-up?...188`,
+       q68 = `When.your.child.is.sick.or.you.need.medical.advice.for.them.where.do.you.usually.go?...189`,
+       q68_other =`...190`,
+       q69 = `Does.your.child.participate.in.any.afterschool.programs.either.at.school.or.somewhere.else.in.the.community?...191`,
+       q70 =`When.school.is.out.for.the.summer.how.often.does.your.child.attend.summer.camp.or.other.enrichment.programs?...192`,
+       q71 = `Have.you.attended.any.programs.or.workshops.to.help.your.child.prepare.for.college.or.vocationaltrade.school?`,
+       q72_r1 = `How.much.do.you.agree.with.the.following.statements?`,
+       q72_r2 =`...195`,
+       q72_r3 =`...196`,
+       q72_r4 =`...197`,
+       q72_r5 =`...198`,
+       q73_r1 = `What.does.your.child.plan.to.do.right.after.graduating.from.high.school?.Check.all.that.apply.`,
+       q73_r2 = `...200`, # going to have to collapse this into one before merging
+       q73_r3 = `...201`,
+       q73_r4 = `...202`,
+       q73_r5 = `...203`,
+       q73_r6 = `...204`,
+       q73_r7 = `...205`,
+       q73_r8 = `...206`,
+       q74_r1 = `Does.your.child.have.any.of.the.following.specific.health.care.needs.and.disabilities.according.to.their.doctor.or.school.staff?.(Check.all.that.apply)...207`,
+       q74_r2 = `...208`,
+       q74_r3 = `...209`,
+       q74_r4 = `...210`,
+       q74_r5 = `...211`,
+       q74_r6 = `...212`,
+       q75 = `If.your.child.has.special.needs.do.you.andor.your.child.know.where.to.go.for.help.in.terms.of.school.programs.community.resources.etc.?...213`,
+       q76 = `Does.your.child.have.health.care.coverage.or.health.insurance?.(Private.insurance.HealthySF.Medi-Cal.etc.)...214`,
+       q77 =`Does.your.child.have.a.regular.doctor.or.nurse?.(Someone.they.see.regularly.for.check.ups.or.health.issues.who.knows.them.and.their.health.history.)...215`,
+       q78 = `When.your.child.is.sick.or.you.need.medical.advice.for.them.where.do.you.usually.go?...216`,
+       q78_other =`...217`,
+       q79 = `Did.your.child.graduate.from.high.school?`,
+       q80 = `Is.your.child.currently.employed?`,
+       q81 = `Is.your.child.currently.enrolled.as.a.student?`,
+       q82 = `Does.your.child.plan.to.enroll.as.a.student.in.the.next.12.months?`,
+       q83_r1 =  `OPTIONAL:.Did.you.receive.any.assistance.from.the.following.organizations.while.completing.this.survey?.(Check.all.that.apply).`, #birth companions
+       q83_r2 = `...224`,#felton
+       q83_r3 =`...225`,#good samaritin
+       q83_r4 =`...226`,#prenatal
+       q83_r5 =`...227`,#IFR
+       q83_r6 =`...228`,#jamestown
+       q83_r7 =`...229`,#la raza
+       q83_r8 =`...230`,#MEDA
+       q83_r9 =`...231`,#grad
+       q83_r10 =`...232`,#MNC
+       q83_r11 =`...233`,#MHC
+       q83_r12 =`...234`,#PPS
+       q83_r13 =`...235`,#support fam
+       q83_r14 =`...236`,#tandem
+       q83_r15 =`...237`) #ymca
+
+
+       
+```
+
+```{r}
+EN_non_valid <- EN_non_valid%>% #removing unncessary columns
+  subset(select = -c(
+         `Collector.ID`, `IP.Address`, `Email.Address`, `First.Name`, `Last.Name`,`Custom.Data.1`))
+
+```
+
+
+
+```{r}
+#removing the responses not within the valid time frame 
+EN <- EN_non_valid[!(EN_non_valid$ID %in% c("114866614691", "114834892657","114850209246")), ]
+
+#removing NA's in the zipcode column
+EN<-EN[!is.na(EN$q3),]
+
+        
+EN <-EN%>%
+  filter(q2 == "Yes",
+         #subsetting for people that said they are parents to children over 24 in the house
+         q1 >= 18,#subsetting for respondent thats at least 18 yrs of age
+         q3 %in% c("94110", "94107","94124","94103","94114","94112", "95141")) #subsetting for bayarea zipcodes deemed as valid
+
+
+```
+
+```{r}
+library(stringr)
+
+EN$q7 <- gsub("\\$", "", EN$q7) 
+EN$q7 <- gsub(",", "", EN$q7)
+
+
+EN$q7 <- as.integer(EN$q7) 
+```
+
+
+
+
+
+
+```{r}
+#changing the respondent who said they had a
+#job that could be in an industry category and keeping 
+#those who didnt the same
+
+EN <- EN%>%
+  mutate(q23_r12 = case_when(q23_r12 == "Stay at home mom" ~ "Stay at home mom",
+                             q23_r12 == "Video production" ~ "Video production",
+                             q23_r12 == "Parent/stay at home" ~ "Parent/stay at home",
+                             q23_r12 == "I am at school" ~ "I am at school",
+                             q23_r12 == "Security" ~ "Security",
+                             q23_r12 == "SAHM" ~ "SAHM",
+                             q23_r12 == "Don’t work" ~ "Don’t work"))
+
+transpo <- "Transportation and Logistics"
+gov <- "Government/Public Sector"
+service <- "Service (e.g. restaurant and food service)"
+bus <- "Business and Finance"
+health <- "Healthcare"
+
+EN[2,77] <- transpo #driver
+EN[11,71] <- gov #law
+EN[15,72] <- health #mental health
+EN[16,68] <- bus #media
+EN[21,76] <- service #interpreting
+EN[53,68] <- bus #marketing
+EN[72,72] <- health #doula
+EN[74,76] <- service #nanny
+
+```
+
+```{r}
+EN <- EN%>%
+  mutate(q28_r13 = case_when(q28_r13 == "VA disability" ~ "VA disability"))
+
+EN[5,94] <- "Not applicable"
+         
+```
+
+```{r}
+#for people who listed other race that
+#still fit into one of categories they were
+#put into said categories
+
+EN <- EN%>%
+  mutate(q37_r7 = case_when(q37_r7 == "Non-white/bipoc" ~ "Non-white/bipoc"))
+         
+        
+EN[1,121] <- "Asian"
+EN[25,119]<-"Latino / Hispanic"
+                        
+```
+
+
+```{r}
+#for families that listed non-MPN schools in the other category
+
+EN$q49 <- ifelse(!is.na(EN$q49_other), "None of the above", EN$q49)
+
+# code detects if other category is filled out 
+#and if so then says none of the above in the original question
+
+EN <- EN%>%
+ mutate(q49_other = case_when(q49_other == "Willie L Brown jr Middle Schooly"~ "NA"))
+
+
+EN$q61<-ifelse(!is.na(EN$q61_other), "None of the above", EN$q61)# code detects if other category is filled out and if so then says none of the above in the original question
+
+EN <- EN%>%
+ mutate(q61_other = case_when(q61_other == "RWHS"~ NA))
+```
+
+
+```{r}
+#making a dataset that doesnt include the 
+#optional question so i can merge...will figure out later if that is a datapoint ill explore
+
+EN_merge <- EN%>%
+   subset(select = -c(
+         `OPTIONAL:.What.is.your.email.address.or.telephone.number?`))
+         
+         #`OPTIONAL:.Did.you.receive.any.assistance.from.the.following.organizations.while.completing.this.survey?.(Check.all.that.apply).`,`...224`,`...225`,`...226`,`...227`,`...228`,`...229`,`...230`,`...231`,`...232`,`...233`,`...234`,`...235`,`...236`,`...237`)) 
+```
+ 
+
+
+##SPANISH CLEANING AND WRANGLING##
+ 
+```{R}
+ES_non_valid <- read_csv("C:/Users/alexandra.fernand/Desktop/ES_Individual Responses_Condensed_250603 (1).zip", show_col_types = FALSE)
+```
+
+```{r}
+names(ES_non_valid)<-str_replace_all(names(ES_non_valid), c(" " = "." , "," = "","/" = ""))
+
+#changing the spaces btw words to periods 
+#in order to change the names, changing the
+#commas and dashes as well to avoid confusion
+
+ES_non_valid <- ES_non_valid%>% 
+  #changing the names w/ the pipe function
+  rename(ID = Respondent.ID,
+         q1 = `¿Cuál.es.su.edad?`,
+         Start = `Start.Date`,
+         End = `End.Date`,
+        q2= `¿Es.padre.madre.o.tutor.de.algún.niño.o.joven.menor.de.24.años.que.viva.en.su.hogar?`,
+        q3 = `¿En.qué.código.postal.reside?`,
+        q4 = `¿Cuál.es.el.nivel.más.alto.de.educación.que.ha.alcanzado.usted?`,
+        q5_r1 = `¿Qué.idiomas.habla.habitualmente.en.su.hogar?.(Marque.todas.las.opciones.que.correspondan).`,
+        q5_r2 = `...15`,
+        q5_r3 = `...16`,
+        q5_r4 = `...17`,
+        q5_r5 = `...18`,
+        q5_r6 = `...19`,
+        q5_r7 = `...20`,
+        q6 =`¿Cuál.de.las.siguientes.opciones.describe.mejor.su.situación.de.vivienda.actual?`,
+        q6_other =`...22`,
+        q7 =`¿Cuánto.paga.mensualmente.de.renta.o.hipoteca.por.el.lugar.donde.vive?.Monto.correspondiente.solo.a.su.parte.del.costo.no.el.total.si.comparte.su.vivienda.con.otras.personas`,
+        q8 = `¿Cuánto.tiempo.lleva.en.su.situación.de.vivienda.actual?`,
+        q9 =`¿Cuántas.veces.se.mudó.en.el.último.año?`,
+        q10_r1=`¿Tiene.acceso.a.Internet.a.través.de.los.siguientes.dispositivos?.(Marque.todas.las.opciones.que.correspondan).`,
+        q10_r2 =`...27`,
+        q10_r3=`...28`,
+        q10_r4 =`...29`,
+        q11_r1 =`¿Dónde.suele.realizar.cada.una.de.las.siguientes.actividades?`,
+        q11_r2 = `...31`,
+        q11_r3 = `...32`,
+        q11_r4 = `...33`,
+        q11_r5 = `...34`,
+       q12_r1 =`¿Dónde.suele.utilizar.o.recibir.cada.uno.de.los.siguientes.servicios?`,
+       q12_r2 = `...36`,
+       q12_r3 = `...37`,
+       q12_r4 = `...38`,
+       q12_r5 = `...39`,
+       q12_r6 = `...40`,
+       q13_r1 = `¿En.qué.medida.está.de.acuerdo.o.en.desacuerdo.con.las.siguientes.afirmaciones?`,
+       q13_r2 = `...42`,
+       q13_r3 = `...43`,
+       q13_r4 = `...44`,
+       q13_r5 = `...45`,
+       q13_r6 = `...46`,
+       q14 =`¿Cómo.calificaría.los.siguientes.servicios.públicos.en.la.Misión?`,
+       q14_r2 = `...48`,
+       q14_r3 = `...49`,
+       q14_r4 = `...50`,
+       q14_r5 = `...51`,
+       q15=`¿Qué.tan.seguro.se.siente.al.caminar.por.la.Mission.durante.el.día?`,
+       q16 = `¿Qué.tan.seguro.se.siente.al.caminar.por.la.Mission.durante.la.noche?`,
+       q17 = `En.comparación.con.hace.tres.años.¿cómo.diría.que.ha.cambiado.la.Misión.en.general?`,
+       q18 = `En.este.momento.¿qué.tan.probable.es.que.recomiende.la.Mission.a.otra.persona.como.un.buen.lugar.para.vivir?`,
+       q19 = `En.general.¿qué.tan.satisfecho.está.con.vivir.en.la.Misión?`,
+       q20_r1 = `En.el.último.año.¿participó.en.alguna.de.las.siguientes.actividades.comunitarias.en.la.Misión?`,
+       q20_r2 = `...58`,
+       q20_r3 = `...59`, #same as '...61'
+       q20_r4 = `...61`,
+       q21_r1 = `¿Qué.tan.probable.cree.que.las.personas.que.conoce.en.la.Misión.le.ayudarían.en.las.siguientes.situaciones?`,
+       q21_r2 = `...63`,
+       q21_r3 = `...64`,
+       q21_r4 = `...65`,
+       q22_r1 =`¿Cuál.de.las.siguientes.opciones.describe.su.situación.laboral?.(Marque.todas.las.opciones.que.correspondan).`,
+       q22_r2 = `...67`,
+       q22_r3 = `...68`,
+       q22_r4 = `...69`,
+       q22_r5 = `...70`,
+       q22_r6 = `...71`,
+       q22_r7 = `...72`,
+       q22_r8 = `...73`,
+       q23_r1 = `Seleccione.la.categoría.de.industria.que.mejor.se.alinea.con.sus.principales.responsabilidades.laborales..(Marque.todas.las.opciones.que.correspondan).`,
+       q23_r2 = `...75`,
+       q23_r3 = `...76`,
+       q23_r4 = `...77`,
+       q23_r5 = `...78`,
+       q23_r6 = `...79`,
+       q23_r7 = `...80`,
+       q23_r8 = `...81`,
+       q23_r9 = `...82`,
+       q23_r10= `...83`,
+       q23_r11= `...84`,
+       q23_r12= `...85`,
+       
+       q24 = `¿Su.trabajo.le.ofrece.tiempo.libre.pagado.yo.licencia.por.enfermedad?`,
+       q25 = `¿Cuántas.horas.por.semana.suele.trabajar?`,
+       q26 = `¿Cuál.fue.el.ingreso.total.de.su.hogar.o.familia.en.2024?`,
+       q27 = `¿Cuál.es.su.puntaje.de.crédito?`,
+       q28_r1 = `¿Está.actualmente.inscrito.en.alguno.de.los.siguientes.programas.de.beneficios.públicos?.(Marque.todas.las.opciones.que.correspondan).`,
+       q28_r2 = `...91`,
+       q28_r3 = `...92`,
+       q28_r5 = `...93`,
+       q28_r6 = `...94`,
+       q28_r7 = `...95`,
+       q28_r8 = `...96`,
+       q28_r9 = `...97`,
+       q28_r10 = `...98`,
+       q28_r11= `...99`,
+       q28_r12=`...100`,
+       q28_r13= `...101`,
+       q29_r1 = `¿Cuáles.de.las.siguientes.opciones.tiene.actualmente?`,
+       q29_r2 = `...103`,
+       q29_r3 = `...104`,
+       q30_r1 = `¿En.qué.medida.está.de.acuerdo.con.cada.una.de.las.siguientes.afirmaciones?`,
+       q30_r2 = `...106`,
+       q30_r3 = `...107`,
+       q30_r4 = `...108`,
+       q31 = `¿Cuánto.dinero.tiene.ahorrado?`,
+       q32 = `En.promedio.¿cuánto.dinero.ahorra.cada.mes?`,
+       q33 = `En.promedio.¿qué.tan.fácil.le.resulta.pagar.la.renta.o.la.hipoteca.de.su.vivienda.cada.mes?`,
+       q34 = `¿Con.qué.frecuencia.usted.o.alguien.en.su.hogar.recibe.alimentos.gratuitos.o.comidas.de.una.despensa.de.alimentos.banco.de.alimentos.iglesia.u.otra.organización.que.brinda.ayuda.con.comida.gratuita?`,
+       q35r_1= `En.los.últimos.12.meses.¿usted.y.su.familia.tuvieron.que.no.poseer.de.sufrir.sin.alguno.de.los.siguientes.debido.a.dificultades.económicas?.(Marque.todas.las.opciones.que.correspondan).`,
+       q35_r2 = `...114`,
+       q35_r3 = `...115`,
+       q35_r4 = `...116`,
+       q35_r5 = `...117`,
+       q35_r6 = `...118`,
+       q35_r7 = `...119`,
+       q35_r8 = `...120`,
+       q35_r9 = `...121`,
+       q35_r10= `...122`,
+       q36 =`¿Cuál.es.su.género?`,
+       q36_other = `...124`,
+       q37_r1 = `¿Cuál.es.su.razaetnicidad?.Marque.todas.las.opciones.que.correspondan.`,
+       q37_r2 = `...126`,
+       q37_r3 = `...127`,
+       q37_r4 = `...128`,
+       q37_r5 = `...129`,
+       q37_r6 = `...130`,
+       q37_r7 = `...131`,
+       q38 = `¿Qué.edad.tiene.su.hijo.mayor.que.vive.con.usted.al.menos.parte.del.tiempo?`,
+       q39_r1 = `¿A.qué.escuelaguardería.asiste.actualmente.su.hijo?`,
+       q39_other  = `...134`,
+       q40_r1 = `¿Su.hijo.tiene.alguna.de.las.siguientes.necesidades.especiales.según.su.médico.o.el.personal.de.la.escuela?.(Marque.todas.las.opciones.que.correspondan)....135`,
+       q40_r2 = `...136`,
+       q40_r3 = `...137`,
+       q40_r4 = `...138`,
+       q40_r5 = `...139`,
+       q40_r6 = `...140`,
+       q40_r7 = `...141`,
+       q40_r8 = `...142`,
+       q40_r9 = `...143`,
+       q41 = `Si.su.hijo.tiene.necesidades.especiales.¿usted.yo.su.hijo.saben.dónde.acudir.para.obtener.ayuda.en.términos.de.programas.escolares.recursos.comunitarios.etc.?...144`,
+       q42 = `¿Qué.tan.satisfecho.está.con.la.escuela.a.la.que.asiste.su.hijo?...145`,
+       q43 = `¿Su.hijo.tiene.cobertura.de.atención.médica.o.seguro.de.salud?.(Seguro.privado.HealthySF.Medi-Cal.etc.)...146`,
+       q44 =`¿Su.hijo.tiene.un.médico.o.enfermero.habitual?.(Alguien.a.quien.vea.regularmente.para.chequeos.o.problemas.de.salud.que.lo.conozca.y.tenga.su.historial.médico.)...147`,
+       q45 = `¿Con.qué.frecuencia.lleva.a.su.hijo.a.un.chequeo.de.rutina?...148`,
+       q46 = `Cuando.su.hijo.necesita.atención.médica.¿a.dónde.suele.acudir?`,
+       q46_other =`...150`,
+       q47 =`¿Cuántos.días.a.la.semana.usted.o.su.familia.leen.libros.con.su.hijo?`,
+       q48 = `En.promedio.¿cuánto.tiempo.al.día.pasan.sus.hijos.frente.a.una.pantalla.(TV.teléfono.computadora).en.casa?.(No.cuenta.el.tiempo.de.pantalla.en.la.escuela)....152`,
+       q49 = `¿A.qué.escuela.asiste.actualmente.su.hijo?...153`,
+       q49_other = `...154`,
+       q50 =`¿Su.hijo.tiene.alguna.de.las.siguientes.necesidades.especiales.según.su.médico.o.el.personal.de.la.escuela?.(Marque.todas.las.opciones.que.correspondan)....155`,
+       q50_r2 = `...156`,
+       q50_r3 = `...157`,
+       q50_r4 = `...158`,
+       q50_r5 = `...159`,
+       q50_r6 = `...160`,
+       q50_r7 = `...161`,
+       q50_r8 = `...162`,
+       q51 = `Si.su.hijo.tiene.necesidades.especiales.¿usted.yo.su.hijo.saben.dónde.acudir.para.obtener.ayuda.en.términos.de.programas.escolares.recursos.comunitarios.etc.?...163`,
+       q52 = `¿Qué.tan.satisfecho.está.con.la.escuela.a.la.que.asiste.su.hijo?...164`,
+       q53 = `¿Su.hijo.tiene.cobertura.de.atención.médica.o.seguro.de.salud?.(Seguro.privado.HealthySF.Medi-Cal.etc.)...165`,
+       q54 =`¿Su.hijo.tiene.un.médico.o.enfermero.habitual?.(Alguien.a.quien.vea.regularmente.para.chequeos.o.problemas.de.salud.que.lo.conozca.y.tenga.su.historial.médico.)...166`,
+       q55 = `¿Con.qué.frecuencia.lleva.a.su.hijo.a.un.chequeo.de.rutina?...167`,
+       q56 = `Cuando.su.hijo.está.enfermo.o.necesita.consejo.médico.¿a.dónde.suele.acudir?...168`,
+       q56_other =`...169`,
+       q57 = `¿Su.hijo.participa.en.algún.programa.extracurricular.ya.sea.en.la.escuela.o.en.otro.lugar.de.la.comunidad?...170`,
+       q58=`Cuando.la.escuela.está.en.receso.durante.el.verano.¿con.qué.frecuencia.asiste.su.hijo.a.un.campamento.de.verano.u.otros.programas.de.enriquecimiento?...171`,
+       q59 = `¿Cuántos.días.a.la.semana.su.hijo.lee.libros.revistas.o.periódicos?.(Con.o.sin.su.ayuda.)`,
+       q60 = `En.promedio.¿cuánto.tiempo.al.día.pasan.sus.hijos.frente.a.una.pantalla.(TV.teléfono.computadora).en.casa?.(No.cuenta.el.tiempo.de.pantalla.en.la.escuela)....173`,
+       q61 = `¿A.qué.escuela.asiste.actualmente.su.hijo?...174`,
+       q61_other = `...175`,
+       q62_r1  =`¿Su.hijo.tiene.alguna.de.las.siguientes.necesidades.especiales.según.su.médico.o.el.personal.de.la.escuela?.(Marque.todas.las.opciones.que.correspondan)....176`,
+       q62_r2 = `...177`,
+       q62_r3 = `...178`,
+       q62_r4 = `...179`,
+       q62_r5 = `...180`,
+       q62_r6 = `...181`,
+       q62_r7 = `...182`,
+       q62_r8 = `...183`,
+       q63 = `Si.su.hijo.tiene.necesidades.especiales.¿usted.yo.su.hijo.saben.dónde.acudir.para.obtener.ayuda.en.términos.de.programas.escolares.recursos.comunitarios.etc.?...184`,
+       q64 = `¿Qué.tan.satisfecho.está.con.la.escuela.a.la.que.asiste.su.hijo?...185`,
+       q65 = `¿Su.hijo.tiene.cobertura.de.atención.médica.o.seguro.de.salud?.(Seguro.privado.HealthySF.Medi-Cal.etc.)...186`,
+       q66 =`¿Su.hijo.tiene.un.médico.o.enfermero.habitual?.(Alguien.a.quien.vea.regularmente.para.chequeos.o.problemas.de.salud.que.lo.conozca.y.tenga.su.historial.médico.)...187`,
+       q67 = `¿Con.qué.frecuencia.lleva.a.su.hijo.a.un.chequeo.de.rutina?...188`,
+       q68 = `Cuando.su.hijo.está.enfermo.o.necesita.consejo.médico.¿a.dónde.suele.acudir?...189`,
+       q68_other =`...190`,
+       q69 = `¿Su.hijo.participa.en.algún.programa.extracurricular.ya.sea.en.la.escuela.o.en.otro.lugar.de.la.comunidad?...191`,
+       q70 =`Cuando.la.escuela.está.en.receso.durante.el.verano.¿con.qué.frecuencia.asiste.su.hijo.a.un.campamento.de.verano.u.otros.programas.de.enriquecimiento?...192`,
+       q71 = `¿Ha.asistido.a.algún.programa.o.taller.para.ayudar.a.su.hijo.a.prepararse.para.la.universidad.o.una.escuela.vocacionaltécnica?`,
+       q72_r1 = `¿Qué.tan.de.acuerdo.está.con.las.siguientes.afirmaciones?`,
+       q72_r2 =`...195`,
+       q72_r3 =`...196`,
+       q72_r4 =`...197`,
+       q72_r5 =`...198`,
+       q73_r1 = `¿Qué.planea.hacer.su.hijo.inmediatamente.después.de.graduarse.de.la.escuela.secundaria?.(Marque.todas.las.opciones.que.correspondan).`,
+       q73_r2 = `...200`,
+       q74_r1 = `¿Su.hijo.tiene.alguna.de.las.siguientes.necesidades.especiales.según.su.médico.o.el.personal.de.la.escuela?.(Marque.todas.las.opciones.que.correspondan)....201`, 
+       q74_r2 = `...202`,
+       q74_r3 = `...203`,
+       q74_r4 = `...204`,
+       q74_r5 = `...205`,
+       q74_r6 = `...206`,
+       q75 = `Si.su.hijo.tiene.necesidades.especiales.¿usted.yo.su.hijo.saben.dónde.acudir.para.obtener.ayuda.en.términos.de.programas.escolares.recursos.comunitarios.etc.?...207`,
+       q76 = `¿Su.hijo.tiene.cobertura.de.atención.médica.o.seguro.de.salud?.(Seguro.privado.HealthySF.Medi-Cal.etc.)...208`,
+       q77 =`¿Su.hijo.tiene.un.médico.o.enfermero.habitual?.(Alguien.a.quien.vea.regularmente.para.chequeos.o.problemas.de.salud.que.lo.conozca.y.tenga.su.historial.médico.)...209`,
+       q78 = `Cuando.su.hijo.está.enfermo.o.necesita.consejo.médico.¿a.dónde.suele.acudir?...210`,
+       q78_other =`...211`,
+       q79 = `¿Su.hijo.se.graduó.de.la.escuela.secundaria?`,
+       q80 = `¿Su.hijo.está.actualmente.empleado?`,
+       q81 = `¿Su.hijo.está.actualmente.inscrito.como.estudiante?`,
+       q82 = `¿Su.hijo.planea.inscribirse.como.estudiante.en.los.próximos.12.meses?`,
+ q83 =  `OPCIONAL:.¿Recibió.alguna.ayuda.de.las.siguientes.organizaciones.al.completar.esta.encuesta?.(Marque.todas.las.opciones.que.correspondan).`, #none of the above
+       q83_r1 = `...218`, #birth companions
+       q83_r2 =`...219`, #felton insitute
+  q83_r3 =`...221`,# samaratin
+       q83_r4 =`...220`,#prenatal
+       q83_r5 =`...222`, #IFR
+       q83_r6 =`...223`, #jamestown
+       q83_r7 =`...224`,#la raza
+       q83_r8 =`...225`,#MEDA
+       q83_r9 =`...226`, #grad
+       q83_r10 =`...227`, #MNC
+       q83_r11=`...228`,#mhc
+       q83_r12 =`...229`,#pps
+       q83_r13 =`...230`, #support families
+       q83_r14 =`...231`, #tandem
+ q83_r15 =`...232`)#YMCA
+
+EN$q83 <- NA # creating this column in english, since the responses on these qustions dont matdh up
+  
+```
+
+```{r}
+ES_non_valid <- ES_non_valid%>%
+  subset(select = -c(
+         `Collector.ID`, `IP.Address`, `Email.Address`, `First.Name`, `Last.Name`,`Custom.Data.1`, `...60`))
+
+
+```
+
+```{r}
+#removing the responses not 
+#within the valid time frame 
+ES <- ES_non_valid[!(ES_non_valid$ID %in% c("114867520713",
+                                            "114850967636")), ]
+
+#removing NA's in the zipcode column
+ES<-ES[!is.na(ES$q3),]
+        
+ES <-ES%>%
+  filter(q2 == "Sí", 
+         #subsetting for people that said they are parents to children over 24 in the house
+         q1 >= 18)
+#subsetting for respondent thats at least 18 yrs of age
+        
+```
+
+
+```{r}
+ES <- ES%>%
+  mutate(q5_r7 = case_when(q5_r7 == "Maya" ~ "Maya"))
+         
+
+ES[42,8] <- "Inglés"
+#respondent #42 said they sometimes speak English so 
+#rather than having that as an "other" said they also spoken english at home
+
+                  
+#seeing if some other responses 
+#can go underneath another living situation category 
+
+ES <- ES%>%
+  mutate(q6_other = case_when(q6_other == "No tengo donde vivir donde meden"~"No tengo donde vivir donde meden",
+                              q6_other== "Tenemos un subcidios por dos años" ~ "Tenemos un subcidios por dos años",
+                              q6_other == "Vivo con mi mamá" ~ "Vivo con mi mamá",
+                              q6_other == "Estudio" ~ "Estudio",
+                               q6_other == "Con unos amigos" ~ "Con unos amigos"))
+                    
+
+      
+ES[86,15] <- "Vivo en un refugio, motel, hotel, SRO u otra vivienda temporal"
+ES[186,15] <- "Alquilo una habitación, garaje u otro espacio en la casa o apartamento de otra persona"
+ES[173,15] <- "Vivo en un refugio, motel, hotel, SRO u otra vivienda temporal"
+```
+
+
+```{r}
+#fixing format of income to all be integers 
+ 
+library(stringr)
+
+ES$q7 <- gsub("\\$", "", ES$q7) 
+ES$q7 <- gsub(",", "", ES$q7)
+ES[12,17] <- "0"
+ES[23,17] <- "1000"
+ES[128,17] <- "0"
+ES[172,17] <- "2100"
+ES[175,17] <- "1500"
+ES[202,17] <- "0"
+ES[321,17] <- "3800"
+ES[342,17] <- "600"
+
+ES$q7 <- as.integer(ES$q7)        
+```
+
+```{r}
+#changing the respondent who said they had a job that could be in an industry 
+#category and keeping those who didnt the same
+
+# creating a new variable that says people do not work
+ES <- ES%>%
+  mutate(q23_r12 = case_when(q23_r12 == "Nada" ~ "Nada",
+                             q23_r12 == "Cuido de mi hijas" ~ "Cuido de mi hijas",
+                             q23_r12 == "none" ~ "none",
+                             q23_r12 == "n/a" ~ "n/a",
+                             q23_r12 == "Casa" ~ "Casa",
+                             q23_r12 == "Cuidar mis ninos y casa" ~ "Cuidar mis ninos y casa",
+                             q23_r12 == "Trabajo solo en el hogar" ~ "Trabajo solo en el hogar",
+                             q23_r12 == "Ama de casa" ~ "Ama de casa",
+                             q23_r12 == "De casa trabajo" ~ "De casa trabajo",
+                             q23_r12 == "Sorter" ~ "Sorter",
+                             q23_r12 == "Na" ~ "Na",
+                             q23_r12 == "No tengo una en espesifi a" ~ "No tengo una en espesifi a" ))
+
+
+
+transportation <- "Transporte y logística"
+govt <- "Government/Public Sector"
+servicios <- "Servicios (por ejemplo, restaurantes y servicio de alimentos)"
+Business <- "Business and Finance"
+healthcare <- "Healthcare"
+nonprofit <- "Organizaciones sin fines de lucro"
+agri <- "Agricultura"
+
+ES[15,76] <- servicios #Limpieza
+ES[18,76] <- servicios #Limpieza
+ES[21,76] <- servicios #Limpieza
+ES[22,76] <- servicios #Limpieza
+ES[30,76] <- servicios #childcare & Limpieza
+ES[33,76] <- servicios #junk removal
+ES[34,76] <- servicios #junk removal
+ES[38,76] <- servicios #housekeeper
+ES[57,76] <- servicios #janitor
+ES[64,76] <- servicios #Limpieza
+ES[68,76] <- servicios #Limpieza
+ES[71,76] <- servicios #Limpieza de company
+ES[73,76] <- servicios #beauty -- question on if its something
+#sold or this person does beauty application
+ES[76,76] <- servicios #Limpieza
+ES[83,76] <- servicios #janitor
+ES[84,76] <- servicios #Limpieza
+
+ES[108,76] <- servicios #Limpieza
+ES[117,76] <- servicios #Limpieza
+ES[121,76] <- servicios #Limpieza
+ES[124,76] <- servicios #Limpieza
+ES[128,76] <- servicios #Limpieza
+ES[139,76] <- servicios #resturante
+ES[140,76] <- servicios #Limpieza
+ES[141,76] <- servicios #Limpieza
+ES[143,76] <- servicios #hotel
+ES[145,76] <- servicios #Limpieza
+ES[148,77] <- transportation #electricidad
+ES[155,76] <- servicios #Limpieza
+ES[164,76] <- servicios #cleaning
+ES[166,76] <- servicios #Limpieza
+ES[168,76] <- servicios #Limpieza
+ES[190,76] <- servicios #Limpieza
+ES[191,76] <- servicios #Limpieza
+ES[193,76] <- servicios #janitor
+ES[212,76] <- servicios #janitor
+ES[215,76] <- servicios #mover
+ES[217,73] <- nonprofit
+ES[220,76] <- servicios #Limpieza
+ES[221,76] <- servicios #Limpieza
+ES[223,76] <- servicios #Trabajadora del hogar
+ES[230,76] <- servicios #Limpieza
+ES[235,76] <- servicios #Limpieza
+ES[236,76] <- servicios #Limpieza
+ES[249,76] <- servicios #Limpieza
+ES[252,76] <- servicios #Limpieza
+ES[260,76] <- servicios #Limpieza
+ES[261,76] <- servicios #Limpieza
+ES[291,76] <- servicios #caregiver
+ES[295,76] <- servicios #Limpieza
+ES[297,76] <- servicios #Limpieza
+ES[299,76] <- servicios #Limpieza
+
+ES[312,76] <- servicios #Limpieza
+
+ES[317,76] <- servicios #Limpieza
+ES[319,67] <- agri #florist
+
+```
+
+```{r}
+## missing a response, spanish version doesnt have the CAAP option,
+#so made a column #4 which wouldve represented CAAP and will make it easier to
+#merge with EN 
+ES$q28_r4 <- NA
+
+#seeing if responses from other are apart of predefined categories 
+ES <- ES%>%
+  mutate(q28_r13 = case_when(q28_r13 == "Mi hijo lo recive" ~ "Mi hijo lo recive",))
+
+
+ES[111,93] <- "No aplica"
+ES[275,93] <- "No aplica"
+                 
+                             
+```
+
+
+```{r}
+#placing other responses into a pre-defined category if applicable, 
+#if not thats when i use the case when to keep the response the same 
+ES <- ES%>%
+  mutate(q35_r10 = case_when(q35_r10 == "No tenemos para conseguir ropa" ~ "No tenemos para conseguir ropa",
+                             q35_r10 == "Porque hemos tenido pocos trabajo y los gastos siempre estan" ~ "Porque hemos tenido pocos trabajo y los gastos siempre estan"))
+
+
+
+ES[7,106] <- "No tuve/tuvimos dificultades económicas"
+ES[20,106] <- "No tuve/tuvimos dificultades económicas"
+ES[182,112] < "Servicios básicos (electricidad, agua, etc.)"
+ES[239,106] <- "No tuve/tuvimos dificultades económicas"
+ES[317,106] <- "No tuve/tuvimos dificultades económicas"
+ES <- ES%>%
+  mutate(q37_r7 = case_when(q35_r10 == "De honduras" ~""))
+
+ES[7,118] <- "Latino / Hispano"
+
+```
+
+
+```{R}
+
+
+ES$q39_r1 <- ifelse(!is.na(ES$q39_other), "Ninguna de las anteriores", ES$q39_r1)
+
+# code detects if other category is filled out and if so then says none of 
+#the above in the original questioin
+
+
+ES <- ES%>%
+  mutate(q39_other = case_when(q39_other == "Lonfalon" ~ NA))
+
+
+
+ES$q49 <- ifelse(!is.na(ES$q49_other), "Ninguna de las anteriores", ES$q49)
+
+# code detects if other category is filled out and if so then says non of the above in the original question
+
+
+ES[45,26] <- "Ninguna de las anteriores"
+ES[99,26] <- "Ninguna de las anteriores"
+ES[110,26] <- "Ninguna de las anteriores"
+ES[128,26] <- "Ninguna de las anteriores"
+ES[148,26] <- "Ninguna de las anteriores"
+ES[165,26] <- "Ninguna de las anteriores"
+
+ES <- ES%>%
+  mutate(q40_r9 = case_when(q40_r9 == "Ninguna" ~ NA))
+
+ES[112,128] <- "Ninguna de las anteriores"
+ES[128,131] <- "Discapacidad del desarrollo, del habla o del aprendizaje"
+ES[262,128] <- "Ninguna de las anteriores"
+ES[312,128] <- "Ninguna de las anteriores"
+
+ES$q49 <- ifelse(!is.na(ES$q49_other), "Ninguna de las anteriores", ES$q49)
+
+
+ES$q61<-ifelse(!is.na(ES$q61_other), " Ninguna de las anteriores", ES$q61)
+
+```
+
+```{r}
+#placing other responses into a pre-defined category if applicable, 
+#if not thats when i use the case when to keep the response the same 
+ES <- ES%>%
+  mutate(q46_other = case_when(q46_other == "UCSF" ~ "UCSF"))
+
+ES[126,142] <-"Sala de emergencias o atención urgente"
+
+
+
+```
+
+
+```{R}
+ES$q49 <- ifelse(!is.na(ES$q49_other), "Ninguna de las anteriores", ES$q49)# code detects if other category is filled out and if so then says none of the above in the original question
+
+ES <- ES%>%
+  mutate(q49_other = case_when(q49_other == "Alvarado Elementary"~ "NA"))
+
+```
+
+
+
+
+```{R}
+#keeping this here 
+
+##ES$q50 <- ifelse(ES$q50_r8 == "Tengo un niño con autismo", "Ninguna de las anteriores", ES$q50) 
+#since all the other responses in the "other"indicate that the respondents children do not have a medical issue w/ the exception of the response above, it does the same function for all other responses to change to fill out the none of the above category
+
+#ES <- ES%>%
+  #mutate(q50_r8 = case_when(q50_r8 == "Tengo un niño con autismo"~ "NA"))
+
+#ES[107,151] <- "Discapacidad del desarrollo, del habla o del aprendizaje"
+
+
+```
+
+
+```{r}
+#Q73 in spanish version of data set is not in "check all that apply form" thats
+#an issue in terms of comparison however to merge ill create the same amount of 
+#responses for q73 as is in the english version
+
+ES$q73_r3 <- NA
+ES$q73_r4 <- NA
+ES$q73_r5 <- NA
+ES$q73_r6 <- NA
+ES$q73_r7 <- NA
+ES$q73_r8 <- NA
+
+ES <- ES%>%
+  mutate(q73_r2 = case_when(q73_r2 == "Un trabajo de medio tiempo"~ "NA"))
+
+ES[294,192] <- "Trabajar a tiempo parcial"
+
+```
+
+```{R}
+ES[9,197] <- "Discapacidad del desarrollo, del habla o del aprendizaje"
+```
+
+```{r}
+
+#making a dataset that doesnt include the optional question so i can 
+#merge...will figure out later if that is a datapoint ill explore
+
+ES_merge <- ES%>%
+   subset(select = -c(
+         `OPCIONAL:.Correo.electrónico.o.número.de.teléfono:`))
+
+# `OPCIONAL:.¿Recibió.alguna.ayuda.de.las.siguientes.organizaciones.al.completar.esta.encuesta?.(Marque.todas.las.opciones.que.correspondan).`, `...218`,`...219`,`...220`,`...221`,`...222`,`...223`,`...224`,`...225`,`...226`,`...227`,`...228`,`...229`,`...230`,`...231`,`...232`
+```
+
+##MERGEEE##
+
+```{r}
+MPN <- ES_merge %>%
+  full_join(EN_merge)
+```
+
+
+##Calculating Percentages##
+
+
+```{r}
+library(dplyr)
+#q1
+MPN%>%
+  group_by(q1)%>%
+  summarise(count = n())
+
+```
+
+
+
+
+
+```{r}
+
+#Q2
+MPN%>%
+  group_by(q2)%>%
+  summarise(count = n())
+
+
+```
+
+
+```{r}
+
+#Q3
+MPN%>%
+  group_by(q3)%>%
+  summarise(count = n())
+
+#problem with one of these, not clear what zipcode it is, "9412"
+
+
+
+```
+
+
+```{r}
+
+#Q4
+MPN%>%
+  group_by(q4)%>%
+  summarise(count = n())
+
+
+naq4 <- sum(is.na(MPN$q4))
+naq4
+
+#where:
+
+#Asistió a la universidad, pero no se graduó	-> attended college
+
+#Diploma de la preparatoria o GED	-> High school diploma or GED	
+
+#Título de asociado (2 años) o formación técnica	--> Associates (2 year) degree or vocational training	
+
+#Menos de educación secundaria	-->Less than high school	
+#Título de posgrado o profesional (por ejemplo, maestría, doctorado, etc.)	--> Graduate or professional degree (Master's, Doctorate, etc.)	
+
+#Título universitario (4 años) --> Bachelors (4 year) degree	
+```
+
+```{r}
+#Q5
+MPN%>%
+  group_by(q5_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q5_r7)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q5_r1, q5_r2 , q5_r3 , q5_r4 , q5_r5, q5_r6, ,q5_r7)%>%
+  summarise(count = n()) #lets me see if anyone completley skipped this quuestion
+
+
+
+#logically can count the na's here and know the total because people wont select this unless they DO speak the language
+```
+
+
+```{r}
+
+#Q6
+MPN%>%
+  group_by(q6)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q6, q6_other) %>%
+  summarise(count = n()) #lets me see if anyone completely skipped this quuestion
+
+
+
+#Alquilo un apartamento o casa	= Rent an apartment or home	
+ 
+ #Alquilo una habitación, garaje u otro espacio en la casa o apartamento de otra persona	 = Rent a room, garage, or other space in someone else's home or apartment	
+ 
+ #Otro (explicar)	 = Other (please specify)	
+ 
+# Soy propietario de mi vivienda	= Own my home	
+ 
+ #Vivo en la calle	- live on the street
+ 
+ #Vivo en un automóvil o casa rodante (RV)	- live in a car
+ 
+ #Vivo en un refugio, motel, hotel, SRO u otra vivienda temporal	-- temporary housing/shelter
+ 
+ #Vivo en una comunidad de vivienda de apoyo permanente	- permanent supportive hgousing
+ 
+```
+
+
+```{R}
+
+#Q7
+MPN%>%
+  group_by(q7)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+
+#Q8
+MPN%>%
+  group_by(q8)%>%
+  summarise(count = n())
+
+naq8 <- sum(is.na(MPN$q8))
+
+
+
+```
+```{R}
+
+#Q9
+MPN%>%
+  group_by(q9)%>%
+  summarise(count = n())
+
+# sum(is.na(MPN$q8))
+
+```
+
+```{R}
+
+#Q10
+MPN%>%
+  group_by(q10_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q10_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q10_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q10_r4)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q10_r1, q10_r2 , q10_r3 , q10_r4 )%>%
+  summarise(count = n())
+
+```
+
+```{R}
+
+#Q11
+MPN%>%
+  group_by(q11_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q11_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q11_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q11_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q11_r5)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+
+#Q12
+MPN%>%
+  group_by(q12_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q12_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q12_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q12_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q12_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q12_r6)%>%
+  summarise(count = n())
+
+```
+
+
+```{R}
+#Q13
+MPN%>%
+  group_by(q13_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q13_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q13_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q13_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q13_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q13_r6)%>%
+  summarise(count = n())
+
+#Algo en desacuerdo	-- SOMETIMES DISAGREE
+#Muy en desacuerdo	-- STRONGLY DISAGREE
+#Ni de acuerdo ni en desacuerdo	-- NEITHER
+#Parcialmente de acuerdo	- SOMEWHAT AGREE
+#Totalmente de acuerdo	-- STRONGLY AGREE
+
+```
+
+```{R}
+#Q14
+MPN%>%
+  group_by(q14)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q14_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q14_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q14_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q14_r5)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#Q15
+MPN%>%
+  group_by(q15)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q16
+MPN%>%
+  group_by(q16)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q17
+MPN%>%
+  group_by(q17)%>%
+  summarise(count = n())
+
+#Empeoró  --> worsen
+#Mejorado --> improve
+```
+
+```{R}
+#Q18
+MPN%>%
+  group_by(q18)%>%
+  summarise(count = n())
+#improbable --> not likely
+#probable --> likely
+```
+
+```{R}
+#Q19
+MPN%>%
+  group_by(q19)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q20
+MPN%>%
+  group_by(q20_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q20_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q20_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q20_r4)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q21
+MPN%>%
+  group_by(q21_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q21_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q21_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q21_r4)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#Q22
+MPN%>%
+  group_by(q22_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q22_r8)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q22_r1, q22_r2 , q22_r3 , q22_r4, q22_r5, q22_r6, q22_r7, q22_r8 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q23
+MPN%>%
+  group_by(q23_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r8)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r9)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r10)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r11)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q23_r12)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q23_r1, q23_r2 , q23_r3 , q23_r4, q23_r5, q23_r6, q23_r7, q23_r8,q23_r9,q23_r10,  q23_r11, q23_r12 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q24
+MPN%>%
+  group_by(q24)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q25
+MPN%>%
+  group_by(q25)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q26
+MPN%>%
+  group_by(q26)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q27
+MPN%>%
+  group_by(q27)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q28
+MPN%>%
+  group_by(q28_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r8)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r9)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r10)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r11)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r12)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q28_r13)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q28_r1, q28_r2 , q28_r3 , q28_r4, q28_r5, q28_r6, q28_r7, q28_r8,q28_r9,q28_r10,  q28_r11, q28_r12, q28_r13 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q29
+MPN%>%
+  group_by(q29_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q29_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q29_r3)%>%
+  summarise(count = n())
+```
+
+```{R}
+#Q30
+MPN%>%
+  group_by(q30_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q30_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q30_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q30_r4)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#q31
+MPN%>%
+  group_by(q31)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q32
+MPN%>%
+  group_by(q32)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q33
+MPN%>%
+  group_by(q33)%>%
+  summarise(count = n())
+```
+```{R}
+#q34
+MPN%>%
+  group_by(q34)%>%
+  summarise(count = n())
+```
+  
+```{R}
+#q35
+MPN%>%
+  group_by(q35r_1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r8)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r9)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q35_r10)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q35r_1, q35_r2 , q35_r3 , q35_r4, q35_r5, q35_r6, q35_r7, q35_r8,q35_r9,q35_r10)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q36
+MPN%>%
+  group_by(q36)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q36, q36_other)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#q37
+MPN%>%
+  group_by(q37_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q37_r7)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q37_r1, q37_r2 , q37_r3 , q37_r4, q37_r5, q37_r6, q37_r7)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q38
+MPN%>%
+  group_by(q38)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q39
+MPN%>%
+  group_by(q39_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q39_other)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q39_r1, q39_other)%>%
+  summarise(count = n())
+```
+
+
+
+```{R}
+#q40
+MPN%>%
+  group_by(q40_r1)%>%   
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q40_r8)%>%
+  summarise(count = n())
+MPN%>%
+  group_by(q40_r9)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q40_r1, q40_r2 , q40_r3 , q40_r4, q40_r5, q40_r6, q40_r7, q40_r8, q40_r9 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#q41
+MPN%>%
+  group_by(q41)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q42
+MPN%>%
+  group_by(q42)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q43
+MPN%>%
+  group_by(q43)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q44
+MPN%>%
+  group_by(q44)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q45
+MPN%>%
+  group_by(q45)%>%
+  summarise(count = n())
+
+
+```
+
+```{R}
+#q46
+MPN%>%
+  group_by(q46)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q46, q46_other)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q47
+MPN%>%
+  group_by(q47)%>%
+  summarise(count = n())
+
+
+```
+
+```{R}
+#q48
+MPN%>%
+  group_by(q48)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q49
+MPN%>%
+  group_by(q49)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q49_other)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q49, q49_other)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q50
+MPN%>%
+  group_by(q50)%>%   
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q50_r8)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q50, q50_r2 , q50_r3 , q50_r4, q50_r5, q50_r6, q50_r7, q50_r8 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#q51
+MPN%>%
+  group_by(q51)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q52
+MPN%>%
+  group_by(q52)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q53
+MPN%>%
+  group_by(q53)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q54
+MPN%>%
+  group_by(q54)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q55
+MPN%>%
+  group_by(q55)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q56
+MPN%>%
+  group_by(q56)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q56, q56_other)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q57
+MPN%>%
+  group_by(q57)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q58
+MPN%>%
+  group_by(q58)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q59
+MPN%>%
+  group_by(q59)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q60
+MPN%>%
+  group_by(q60)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q61
+MPN%>%
+  group_by(q61)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q61, q61_other)%>%
+  summarise(count = n())
+```
+
+
+
+
+
+```{R}
+#q62
+MPN%>%
+  group_by(q62_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by()%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q62_r8)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q62_r1, q62_r2 , q62_r3 , q62_r4, q62_r5, q62_r6, q62_r7, q62_r8 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#q63
+MPN%>%
+  group_by(q63)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q64
+MPN%>%
+  group_by(q64)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q65
+MPN%>%
+  group_by(q65)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q66
+MPN%>%
+  group_by(q66)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q67
+MPN%>%
+  group_by(q67)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q68
+MPN%>%
+  group_by(q68)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q68, q68_other)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q69
+MPN%>%
+  group_by(q69)%>%
+  summarise(count = n())
+
+
+```
+
+```{R}
+#q70
+MPN%>%
+  group_by(q70)%>%
+  summarise(count = n())
+```
+
+
+
+```{R}
+#q71
+MPN%>%
+  group_by(q71)%>%
+  summarise(count = n())
+```
+
+
+
+```{R}
+#q72
+MPN%>%
+  group_by(q72_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q72_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q72_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q72_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q72_r5)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#q73
+MPN%>%
+  group_by(q73_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r2 )%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r5)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r6)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r7)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q73_r8)%>%
+  summarise(count = n())
+
+
+ MPN%>%
+  group_by(q73_r1, q73_r2 , q73_r3 , q73_r4, q73_r5, q73_r6, q73_r7, q73_r8 )%>%
+  summarise(count = n())
+```
+
+```{R}
+#q74
+MPN%>%
+  group_by(q74_r1)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q74_r2)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q74_r3)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q74_r4)%>%
+  summarise(count = n())
+
+MPN%>%
+  group_by(q74_r5)%>%
+  summarise(count = n())
+
+ MPN%>%
+  group_by(q74_r1, q74_r2, q74_r3, q74_r4, q74_r5)%>%
+  summarise(count = n())
+
+```
+
+```{R}
+#q75
+MPN%>%
+  group_by(q75)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#q76
+MPN%>%
+  group_by(q76)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q77
+MPN%>%
+  group_by(q77)%>%
+  summarise(count = n())
+```
+
+
+```{R}
+#q78
+MPN%>%
+  group_by(q78)%>%
+  summarise(count = n())
+```
+
+```{R}
+
+#q79
+MPN%>%
+  group_by(q79)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q80
+MPN%>%
+  group_by(q80)%>%
+  summarise(count = n())
+```
+
+```{R}
+#q81
+MPN%>%
+  group_by(q81)%>%
+  summarise(count = n())
+
+#PN%>%
+ 
+#group_by(q81,q81_other)%>%
+ #summarise(count = n())
+```
+
+```{R}
+#q82
+MPN%>%
+  group_by(q82)%>%
+  summarise(count = n())
+```
+
+
+## CREATING VARIABLES FOR CROSSTAB ##
+
+```{r}
+library(dplyr)
+```
+  
+```{r}
+#creating MPN school variable
+
+
+
+## 1) cleaning up age group variables 
+
+MPN <- MPN%>%
+  mutate(infant = case_when(q39_r1 == "Centro de bebés y niños pequeños (por ejemplo, Felton Institute; MNC Early Head Start)"~ "Infant-toddler center (e.g.Felton Institute; MNC Early Head Start)",
+                            q39_r1 == "Guardería operada en la casa de alguien" ~  "Daycare that is operated in someone’s home",
+                            q39_r1 != "Guardería operada en la casa de alguien" | q39_r1 != "Infant-toddler center (e.g.Felton Institute; MNC Early Head Start)" ~ q39_r1),
+         es_ms = case_when(q49 == "César Chávez ES" ~ "Cesar Chavez Elementary School",
+                           q49 == "Sánchez ES" ~ "Sanchez Elementary School",
+                           q49 != "César Chávez ES"|q49!= "Sánchez ES"~ q49),
+         hs = case_when(q61 == "Mi hijo abandonó la escuela" ~ "My child dropped out of school",
+                        q61 != "Mi hijo abandonó la escuela" ~ q61))
+
+```
+
+```{r}
+##determining what school is mpn vs not by age group
+
+MPN <- MPN%>%
+  mutate(infant = case_when(q39_r1 == "Buena Vista Horace Mann K-8" ~1,
+                            q39_r1 != "Buena Vista Horace Mann K-8" ~ 0),
+         es_ms = case_when((q49 == "Bryant ES" | q49 == "Buena Vista Horace Mann K-8"| q49 == "Cesar Chavez Elementary School"| q49 == "Everett MS"| q49 == "Leonard R. Flynn ES"| q49 == "James Lick MS"| q49 == "Everett Middle School"| q49 == "Leonard R. Flynn Elementary School"| q49 == "James Lick Middle School"| q49 == "Sanchez Elementary School"| q49 == "Bryant Elementary School" | q49 == "César Chávez ES" | q49 == "Sánchez ES") ~ 1,
+                           (q49 != "Bryant ES" | q49 != "Buena Vista Horace Mann K-8"| q49 != "Cesar Chavez Elementary School"| q49 != "Everett MS"| q49 != "Leonard R. Flynn ES"| q49 != "James Lick MS"| q49 != "Everett Middle School"| q49 != "Leonard R. Flynn Elementary School"| q49 != "James Lick Middle School"| q49 != "Sanchez Elementary School"| q49  != "Bryant Elementary School" | q49 != "César Chávez ES" | q49 != "Sánchez ES") ~ 0),
+         hs = case_when((q61 == "Mission High School"| q61 == "John O'Connell Technical High School") ~ 1,
+                        (q61 != "Mission High School"| q61 != "John O'Connell Technical High School") ~ 0))
+
+MPN%>%
+ group_by(infant, es_ms, hs)%>%
+  summarise(count = n()) 
+  
+
+MPN%>%
+  filter(MPN$es_ms == 1 & MPN$hs == 0)
+
+
+
+```
+
+ 
+
+
+
+
+
+
+
+
+
+```{r}
+#2) assigning the to a variable that indicates if the child attends an MPN School
+
+MPN <- MPN%>%
+  mutate(MPN_School = case_when(es_ms == 1 ~ 1,
+                                es_ms == 0 ~ 0,
+                                infant == 1 ~ 1,
+                                infant == 0 ~ 0,
+                                hs == 1 ~ 1,
+                                hs == 0 ~ 0))
+    
+#transitional youth are not included in MPN School, fixing this so they are not counted as NA values
+
+MPN <- MPN %>%
+  mutate(
+    MPN_School = if_else(
+      q38 == "Educación postsecundaria o en transición (19-24 años que viven en casa)" | 
+      q38 == "Postsecondary or Transition-Aged (ages 19-24 who live at home)",
+      0, 
+      MPN_School, 
+      missing = MPN_School # keeps what is NA as NA
+    )
+  )
+
+table(MPN$MPN_School) #122 adds up to the amount of MPN families indicated, 188 
+```
+```{R}
+#creating MPN footprint variable
+
+MPN <- MPN%>%
+  mutate(MPN_Footprint = case_when(q3 == 94103 | q3 == 94110 ~ 1,
+                                   q3 != 94103 & q3 != 94110 ~ 0))
+ 
+table(MPN$MPN_Footprint)
+```
+
+```{R}
+#creating MPN Services variable
+
+MPN <- MPN%>%
+  mutate(MPN_Partner = case_when( q83_r1  != "NA" ~ 1,
+                        q83_r2  != "NA" ~ 1,
+                        q83_r3 != "NA" ~ 1,
+                        q83_r4 != "NA" ~ 1,
+                        q83_r5 != "NA" ~ 1,
+                        q83_r6 != "NA" ~ 1,
+                        q83_r7 != "NA" ~ 1,
+                        q83_r8 != "NA" ~ 1,
+                        q83_r9 != "NA" ~ 1,
+                        q83_r10 != "NA" ~ 1,
+                        q83_r11 != "NA" ~ 1,
+                        q83_r12 != "NA" ~ 1,
+                        q83_r13 != "NA" ~ 1,
+                        q83_r14 != "NA" ~ 1,
+                        q83_r15 != "NA" ~ 1))
+
+MPN$MPN_Partner <- ifelse(is.na(MPN$MPN_Partner), 0, MPN$MPN_Partner)
+
+```
+
+
+
+## CROSS TAB TIME!!! ##
+
+
+```{R}
+#q3
+table_q3 <- table(MPN$q3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q3) # Adds sum margins
+```
+
+```{R}
+#q6
+table_q6 <- table(MPN$q6, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q6) # Adds sum margins
+```
+
+```{R}
+#q8
+table_q8 <- table(MPN$q8, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q8) # Adds sum margins
+```
+```{R}
+#q9
+table_q9 <- table(MPN$q9, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q9) # Adds sum margins
+```
+```{R}
+#q11_r1
+table_q11_r1 <- table(MPN$q11_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q11_r1) # Adds sum margins
+```
+
+```{R}
+#q11_r2
+table_q11_r2 <- table(MPN$q11_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q11_r2) # Adds sum margins
+```
+
+```{R}
+#q11_r3
+table_q11_r3 <- table(MPN$q11_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q11_r3) # Adds sum margins
+```
+
+```{R}
+#q11_r4
+table_q11_r4 <- table(MPN$q11_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q11_r4) # Adds sum margins
+```
+
+```{R}
+table_q11_r5 <- table(MPN$q11_r5, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q11_r5) # Adds sum margins
+```
+```{R}
+table_q12_r1 <- table(MPN$q12_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r1) # Adds sum margins
+```
+
+
+```{R}
+table_q12_r2 <- table(MPN$q12_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r2) # Adds sum margins
+```
+
+```{R}
+table_q12_r3 <- table(MPN$q12_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r3) # Adds sum margins
+```
+
+
+```{R}
+table_q12_r4 <- table(MPN$q12_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r4) # Adds sum margins
+```
+
+```{R}
+table_q12_r5 <- table(MPN$q12_r5, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r5) # Adds sum margins
+```
+
+```{R}
+table_q12_r6 <- table(MPN$q12_r6, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q12_r6) # Adds sum margins
+```
+
+```{R}
+table_q13_r1 <- table(MPN$q13_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r1) # Adds sum margins
+```
+
+```{R}
+table_q13_r2 <- table(MPN$q13_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r2) # Adds sum margins
+```
+
+```{R}
+table_q13_r3 <- table(MPN$q13_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r3) # Adds sum margins
+```
+
+```{R}
+table_q13_r4 <- table(MPN$q13_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r4) # Adds sum margins
+```
+
+```{R}
+table_q13_r5 <- table(MPN$q13_r5, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r5) # Adds sum margins
+```
+
+```{R}
+table_q13_r6 <- table(MPN$q13_r6, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q13_r6) # Adds sum margins
+```
+
+```{R}
+table_q14 <- table(MPN$q14, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q14) # Adds sum margins
+```
+
+```{R}
+table_q14_r2 <- table(MPN$q14_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q14_r2) # Adds sum margins
+
+```
+
+```{R}
+table_q14_r3 <- table(MPN$q14_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q14_r3) # Adds sum margins
+
+```
+
+```{R}
+table_q14_r4 <- table(MPN$q14_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q14_r4) # Adds sum margins
+
+```
+
+```{R}
+table_q14_r5 <- table(MPN$q14_r5, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q14_r5) # Adds sum margins
+
+```
+
+
+
+
+
+
+
+```{R}
+#q18
+table_q18 <- table(MPN$q18, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q18) # Adds sum margins
+```
+
+```{R}
+#q20
+table_q20_r1 <- table(MPN$q20_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q20_r1) # Adds sum margins
+```
+```{R}
+#q20
+table_q20_r2 <- table(MPN$q20_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q20_r2) # Adds sum margins
+```
+
+```{R}
+#q20
+table_q20_r3 <- table(MPN$q20_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q20_r3) # Adds sum margins
+```
+
+```{R}
+#q20
+table_q20_r4 <- table(MPN$q20_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q20_r4) # Adds sum margins
+```
+
+```{R}
+#q21
+table_q21_r1 <- table(MPN$q21_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q21_r1) # Adds sum margins
+```
+```{R}
+#q21
+table_q21_r2 <- table(MPN$q21_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q21_r2) # Adds sum margins
+```
+
+```{R}
+#q21
+table_q21_r3 <- table(MPN$q21_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q21_r3) # Adds sum margins
+```
+
+```{R}
+#q21
+table_q21_r4 <- table(MPN$q21_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q21_r4) # Adds sum margins
+```
+
+
+```{R}
+#q22
+table_q22_r1 <- table(MPN$q22_r1, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r1) # Adds sum margins
+
+table_q22_r2 <- table(MPN$q22_r2, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r2)
+
+
+table_q22_r3 <- table(MPN$q22_r3, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r3)
+
+table_q22_r4 <- table(MPN$q22_r4, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r4)
+
+table_q22_r5 <- table(MPN$q22_r5, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r5)
+
+table_q22_r6 <- table(MPN$q22_r6, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r6)
+
+table_q22_r7 <- table(MPN$q22_r7, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r7)
+
+table_q22_r8 <- table(MPN$q22_r8, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r8)
+
+table_q22_r9 <- table(MPN$q22_r9, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q22_r9)
+
+```
+
+```{R}
+
+#q27   
+table_q27 <- table(MPN$q27, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q27) # Adds sum margins
+
+```
+
+```{R}
+
+#q28 for MPN partners
+table_q28_r1 <- table(MPN$q28_r1, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r1) # Adds sum margins
+
+
+
+table_q28_r2 <- table(MPN$q28_r2, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r2)
+
+
+table_q28_r3 <- table(MPN$q28_r3, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r3)
+
+table_q28_r4 <- table(MPN$q28_r4, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r4)
+
+table_q28_r5 <- table(MPN$q28_r5, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r5)
+
+table_q28_r6 <- table(MPN$q28_r6, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r6)
+
+table_q28_r7 <- table(MPN$q28_r7, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r7)
+
+table_q28_r8 <- table(MPN$q28_r8, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r8)
+
+table_q28_r9 <- table(MPN$q28_r9, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r9)
+
+table_q28_r10 <- table(MPN$q28_r10, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r10)
+
+table_q28_r11 <- table(MPN$q28_r11, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r11)
+
+table_q28_r12 <- table(MPN$q28_r12, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r12)
+
+table_q28_r13 <- table(MPN$q28_r13, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r13)
+
+```
+
+```{R}
+
+#q28 for MPN Footprint
+table_q28_r1 <- table(MPN$q28_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r1) # Adds sum margins
+
+
+
+table_q28_r2 <- table(MPN$q28_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r2)
+
+
+table_q28_r3 <- table(MPN$q28_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r3)
+
+table_q28_r4 <- table(MPN$q28_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r4)
+
+table_q28_r5 <- table(MPN$q28_r5, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r5)
+
+table_q28_r6 <- table(MPN$q28_r6, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r6)
+
+table_q28_r7 <- table(MPN$q28_r7, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r7)
+
+table_q28_r8 <- table(MPN$q28_r8, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r8)
+
+table_q28_r9 <- table(MPN$q28_r9, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r9)
+
+table_q28_r10 <- table(MPN$q28_r10, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r10)
+
+table_q28_r11 <- table(MPN$q28_r11, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r11)
+
+table_q28_r12 <- table(MPN$q28_r12, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r12)
+
+table_q28_r13 <- table(MPN$q28_r13, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q28_r13)
+
+```
+
+```{R}
+#q29_r1
+table_q29_r1 <- table(MPN$q29_r1, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q29_r1)
+```
+
+```{R}
+#q29_r2
+table_q29_r2 <- table(MPN$q29_r2, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q29_r2)
+```
+
+```{R}
+#q29_r3
+table_q29_r3 <- table(MPN$q29_r3, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q29_r3)
+```
+
+
+```{R}
+#q30_r1 for MPN_Footprint
+table_q30_r1 <- table(MPN$q30_r1, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r1)
+```
+
+```{R}
+#q30_r2 for MPN_Footprint
+table_q30_r2 <- table(MPN$q30_r2, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r2)
+```
+
+```{R}
+#q30_r3 for MPN_Footprint
+table_q30_r3 <- table(MPN$q30_r3, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r3)
+```
+
+```{R}
+#q30_r4 for MPN_Footprint
+table_q30_r4 <- table(MPN$q30_r4, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r4)
+```
+
+
+```{R}
+#q30_r1 for MPN_Partner
+table_q30_r1 <- table(MPN$q30_r1, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r1)
+```
+
+```{R}
+#q30_r2 for MPN_Partner
+table_q30_r2 <- table(MPN$q30_r2, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r2)
+```
+
+```{R}
+#q30_r3 for MPN_Partner
+table_q30_r3 <- table(MPN$q30_r3, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r3)
+```
+
+```{R}
+#q30_r4 for MPN_Partner
+table_q30_r4 <- table(MPN$q30_r4, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q30_r4)
+```
+
+```{R}
+#q33 for MPN_Partner
+table_q33 <- table(MPN$q33, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q33)
+```
+
+```{R}
+#q33 for MPN_Footprint
+table_q33 <- table(MPN$q33, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q33)
+```
+
+
+```{R}
+#q34 for MPN_Partner
+table_q34 <- table(MPN$q34, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q34)
+```
+
+```{R}
+table(MPN$MPN_School)
+
+#q38 
+table_q38 <- table(MPN$q38, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q38)
+```
+
+
+```{R}
+#q39
+table_q39_r1 <- table(MPN$q39_r1, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q39_r1)
+```
+
+```{r}
+#disability question
+
+#creating new column where all of these are included
+
+
+
+
+MPN <- MPN%>%
+  mutate(disabilityq_aggregate = paste(
+    ifelse(is.na(q41), "", q41),
+    ifelse(is.na(q51), "", q51),
+    ifelse(is.na(q63), "", q63),
+    ifelse(is.na(q75), "", q75)
+  ))
+
+  
+
+table_aggregate1 <- table(MPN$disabilityq_aggregate, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_aggregate1)
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#satisfaction question
+#creating new column where all of these are included
+
+MPN <- MPN%>%
+  mutate(satisfactionq_aggregate = paste(
+    ifelse(is.na(q42), "", q42),
+    ifelse(is.na(q52), "", q52),
+    ifelse(is.na(q64), "", q64)
+  ))
+
+  
+
+table_aggregate2 <- table(MPN$satisfactionq_aggregate, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_aggregate2)
+
+```
+
+
+
+```{R}
+#q49
+table_q49 <- table(MPN$q49, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q49)
+```
+
+```{R}
+#q57
+table_q57 <- table(MPN$q57, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q57)
+```
+
+```{R}
+#q58
+table_q58 <- table(MPN$q58, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q58)
+```
+
+```{R}
+#q61
+table_q61 <- table(MPN$q61, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q61)
+
+
+```
+
+```{R}
+#q71
+table_q71 <- table(MPN$q71, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q71)
+```
+
+```{R}
+#q72
+table_q72_r1 <- table(MPN$q72_r1, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q72_r1)
+```
+
+```{R}
+#q72
+table_q72_r2 <- table(MPN$q72_r2, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q72_r2)
+
+```
+
+```{R}
+#q72
+table_q72_r3 <- table(MPN$q72_r3, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q72_r3)
+```
+
+```{R}
+#q72
+table_q72_r4 <- table(MPN$q72_r4, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q72_r4)
+```
+
+```{R}
+#q72
+table_q72_r1 <- table(MPN$q72_r1, MPN$MPN_School, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q72_r1)
+```
+```{R}
+#q75 for MPN_Footprint
+table_q75 <- table(MPN$q75, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q75)
+```
+
+```{R}
+#q75 for MPN_Partner
+table_q75_2 <- table(MPN$q75, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q75_2)
+```
+
+
+
+```{R}
+#q76 for MPN_Footprint
+table_q76 <- table(MPN$q76, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q76)
+```
+
+```{R}
+#q76 for MPN_Partner
+table_q76_2 <- table(MPN$q76, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q76_2)
+```
+
+
+
+
+
+
+```{R}
+#q77 for MPN_Footprint
+table_q77 <- table(MPN$q77, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q77)
+```
+
+```{R}
+#q77 for MPN_Partner
+table_q77_2 <- table(MPN$q77, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q77_2)
+```
+
+
+```{R}
+#q81 for MPN_Footprint
+table_q81 <- table(MPN$q81, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q81)
+```
+
+```{R}
+#q81 for MPN_Partner
+table_q81 <- table(MPN$q81, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q81)
+```
+
+```{R}
+#q82 for MPN_Footprint
+table_q82 <- table(MPN$q82, MPN$MPN_Footprint, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q82)
+```
+
+```{R}
+#q82 for MPN_Partner
+table_q82 <- table(MPN$q82, MPN$MPN_Partner, useNA = "always")  # useNA="always" includes NAs
+addmargins(table_q82)
+```
